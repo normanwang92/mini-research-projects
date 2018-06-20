@@ -7,10 +7,6 @@ library(timeDate)
 setwd("/Users/Norman/Documents/GitHub/INVESCO/Q1")
 DB_NAME = "sp_data.rds"
 
-## setting up Quandl
-quandl_api = "JXaNY6Li64nKFE2zXH6u"
-Quandl.api_key(quandl_api)
-
 ## getting sp 500 constituents 
 sp_symbols <- function(){
   
@@ -32,8 +28,7 @@ get_single_stock <-
   function(sym, start_date, end_date) {
     
     # make sure start_date is no greater than end_date 
-    #   if start_date is same as end_date, make sure it's weekday
-    
+    #   if start_date is same as end_date, make sure it's business day
     stopifnot(start_date <= end_date) 
     tf <- seq(as.Date(start_date), as.Date(end_date),by = 1)
     tf <- tf[isBizday(timeDate(tf), holidays = holidayNYSE(1975:2018), wday = 1:5)]
@@ -47,23 +42,6 @@ get_single_stock <-
     
     require(devtools)
     
-    # create a vector with all lines
-    # tryCatch(Quandl(c(
-    #   paste0("WIKI/", sym, ".8"),  #  Adj. Open
-    #   paste0("WIKI/", sym, ".9"),  # Adj. High
-    #   paste0("WIKI/", sym, ".10"), # Adj. Low
-    #   paste0("WIKI/", sym, ".11"), # Adj. Close
-    #   paste0("WIKI/", sym, ".12")), # Adj. Volume
-    #   start_date = start_date,
-    #   end_date = end_date,
-    #   type = "zoo"
-    # ))
-    # getSymbols(sym, 
-    #            auto.assign=FALSE, 
-    #            from=start_date, 
-    #            to=as.Date(end_date)+1, 
-    #            src="yahoo"
-    # )
     tryCatch(
       getSymbols(sym,
                  auto.assign=FALSE,
@@ -71,16 +49,17 @@ get_single_stock <-
                  to=as.Date(end_date)+1,
                  src="yahoo"
       ),
-      error=function(cond){
-        message(cond)
-        message("Return emtpy dataframe.")
-  
-        col_names <- c(".Open",".High",".Low",".Close",".Volume",".Adjusted")
-        col_names <- paste(sym,col_names,sep = "")
-        empty_df <- as.data.frame(matrix(ncol = 6, nrow = length(tf)), row.names = tf)
-        empty_df <- set_names(emtpy_df,col_names)
-        print(empty_df)
-        return(empty_df)
+      error=function(cond){ ## ignoring error flag
+        
+        # col_names <- c(".Open",".High",".Low",".Close",".Volume",".Adjusted")
+        # col_names <- paste(sym,col_names,sep = "")
+        # 
+        # empty_df <- as.data.frame(matrix(data = -999.0, ncol = 6, nrow = length(tf)), 
+        #                           row.names = tf)
+        # 
+        # empty_df <- set_names(empty_df,col_names)
+        # 
+        # return(empty_df)
       }
     )
   }
@@ -150,7 +129,7 @@ update_all_stocks <-
     
     ## expanding data for existing names
     for(s in existing_names) {
-      # print("updating %s", s)
+      cat(".")
       existing_data[[s]] <- update_single_stock(s,existing_data[[s]],start_date,end_date)
     }
     
@@ -165,8 +144,8 @@ update_all_stocks <-
       existing_data <- c(existing_data, new_data)
     }
     
-    ## updating database
-    # saveRDS(existing_data, file = DB_NAME)
-    # 
+    # updating database
+    saveRDS(existing_data, file = DB_NAME)
+
     return(existing_data)
   }
