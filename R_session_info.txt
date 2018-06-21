@@ -1,0 +1,37 @@
+R version 3.5.0 (2018-04-23)
+Platform: x86_64-apple-darwin15.6.0 (64-bit)
+Running under: macOS High Sierra 10.13.4
+
+Matrix products: default
+BLAS: /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libBLAS.dylib
+LAPACK: /Library/Frameworks/R.framework/Versions/3.5/Resources/lib/libRlapack.dylib
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+ [1] bindrcpp_0.2.2             tidyquant_0.5.5            forcats_0.3.0             
+ [4] stringr_1.3.1              purrr_0.2.5                readr_1.1.1               
+ [7] tidyr_0.8.1                tibble_1.4.2               ggplot2_2.2.1             
+[10] tidyverse_1.2.1            quantmod_0.4-13            TTR_0.23-3                
+[13] PerformanceAnalytics_1.5.2 lubridate_1.7.4            dplyr_0.7.5               
+[16] dygraphs_1.1.1.4           shiny_1.1.0                timeDate_3043.102         
+[19] bizdays_1.0.5              chron_2.3-52               rvest_0.3.2               
+[22] xml2_1.2.0                 devtools_1.13.5            Quandl_2.8.0              
+[25] xts_0.10-2                 zoo_1.8-2                 
+
+loaded via a namespace (and not attached):
+ [1] httr_1.3.1       jsonlite_1.5     modelr_0.1.2     assertthat_0.2.0 selectr_0.4-1   
+ [6] cellranger_1.1.0 yaml_2.1.19      pillar_1.2.3     lattice_0.20-35  glue_1.2.0      
+[11] quadprog_1.5-5   digest_0.6.15    promises_1.0.1   colorspace_1.3-2 htmltools_0.3.6 
+[16] httpuv_1.4.3     plyr_1.8.4       psych_1.8.4      pkgconfig_2.0.1  broom_0.4.4     
+[21] haven_1.1.1      xtable_1.8-2     scales_0.5.0     later_0.7.3      withr_2.1.2     
+[26] lazyeval_0.2.1   cli_1.0.0        mnormt_1.5-5     magrittr_1.5     crayon_1.3.4    
+[31] readxl_1.1.0     mime_0.5         memoise_1.1.0    nlme_3.1-137     foreign_0.8-70  
+[36] tools_3.5.0      hms_0.4.2        munsell_0.5.0    compiler_3.5.0   rlang_0.2.1     
+[41] grid_3.5.0       rstudioapi_0.7   htmlwidgets_1.2  timetk_0.1.1     labeling_0.3    
+[46] gtable_0.2.0     curl_3.2         reshape2_1.4.3   R6_2.2.2         bindr_0.1.1     
+[51] stringi_1.2.3    parallel_3.5.0   Rcpp_0.12.17     tidyselect_0.2.4

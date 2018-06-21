@@ -7,8 +7,11 @@ library(timeDate)
 setwd("/Users/Norman/Documents/GitHub/INVESCO/Q1")
 DB_NAME = "sp_data.rds"
 
-## getting sp 500 constituents 
+## get s&p500 constituents 
 sp_symbols <- function(){
+  #' data scraper to get the s&p 500 constituents
+  #' 
+  #' @return A list of tickers of s&p 500 universe
   
     sp500_wiki <- read_html("https://en.wikipedia.org/wiki/List_of_S%26P_500_companies")
     
@@ -23,9 +26,15 @@ sp_symbols <- function(){
   return(symbols)
   }
 
-## getting daily prices and volume for one stock
 get_single_stock <-
   function(sym, start_date, end_date) {
+    #' ## getting daily prices and volume for one stock
+    #' 
+    #' @param sym A string representing the ticker/symbol
+    #' @param start_date A string
+    #' @param end_date A string
+    #' 
+    #' @return An xts object containing time series data for sym
     
     # make sure start_date is no greater than end_date 
     #   if start_date is same as end_date, make sure it's business day
@@ -33,10 +42,9 @@ get_single_stock <-
     tf <- seq(as.Date(start_date), as.Date(end_date),by = 1)
     tf <- tf[isBizday(timeDate(tf), holidays = holidayNYSE(1975:2018), wday = 1:5)]
     
-    if(length(tf) == 0){
-      return()
-    }
+    if(length(tf) == 0){return()}
     
+    # get business start and end date within the specified time frame
     start_date <- tf[1]
     end_date <- tail(tf,1)
     
@@ -49,35 +57,39 @@ get_single_stock <-
                  to=as.Date(end_date)+1,
                  src="yahoo"
       ),
-      error=function(cond){ ## ignoring error flag
-        
-        # col_names <- c(".Open",".High",".Low",".Close",".Volume",".Adjusted")
-        # col_names <- paste(sym,col_names,sep = "")
-        # 
-        # empty_df <- as.data.frame(matrix(data = -999.0, ncol = 6, nrow = length(tf)), 
-        #                           row.names = tf)
-        # 
-        # empty_df <- set_names(empty_df,col_names)
-        # 
-        # return(empty_df)
+      error=function(cond){ 
+        # ignoring error flag, error mostly caused by unavailable data from server
       }
     )
   }
 
-## expand on current zoo series of daily prices and volume for single stock
+
 update_single_stock <-
   function(sym, ts_series, start_date, end_date){
+    #' expand on current zoo series of daily prices and volume for ticker 'sym'
+    #' 
+    #' @param sym A string representing the ticker/symbol
+    #' @param ts_series A xts object containing existing data for sym
+    #' @param start_date A string
+    #' @param end_date A string
+    #' 
+    #' @return An xts object containing updated time series data for sym
+    
+    # get the existing start and end date of ts_series
     previous_start <- index(ts_series)[1]
     previous_end <- tail(index(ts_series),1)
     
+    # if new start date goes back further, expand ts_series from new start date to
+    #   existing start date
     if(start_date < previous_start){
-
       end_date_to_bind <- as.Date(previous_start, format="%Y-%m-%d")-1
       data_to_bind <-
         get_single_stock(sym, start_date = start_date, end_date = end_date_to_bind)
       ts_series <- rbind(data_to_bind, ts_series)
     }
 
+    # similarly, if new end date goes beyond, expand ts_series from existing end date to
+    #   new end date
     if(end_date > previous_end){
       start_date_to_bind <- as.Date(previous_end, format="%Y-%m-%d")+1
       data_to_bind <-
@@ -88,12 +100,21 @@ update_single_stock <-
     return(ts_series)
   }
 
-## get daily prices and volumes for all stocks
 get_all_stocks <-
   function(syms = sp_symbols(), start_date, end_date, save_file = TRUE, return_file = FALSE) {
+    #' wrapper to get daily prices and volumes for all stocks with options either to 
+    #' save to database or return the data
+    #' 
+    #' @param syms A list of string representing the ticker/symbol, default to 
+    #' @param start_date A string
+    #' @param end_date A string
+    #' @param save_file A boolean, save to database if TRUE
+    #' @param save_file A boolean, return result if TRUE
+    #' 
+    #' @return A list of xts objects containing time series data for whole universe
     
+    # make sure start date no greater than end date
     stopifnot(start_date <= end_date)
-    
     all_data <- list()
     
     for(s in syms){
@@ -115,8 +136,16 @@ get_all_stocks <-
 
 update_all_stocks <- 
   function(syms = sp_symbols(), existing_data = readRDS(DB_NAME), start_date, end_date) {
+    #' wrapper to update daily prices and volumes for all stocks up to time horizon specified
+    #' 
+    #' @param syms A list of string representing the ticker/symbol, default to 
+    #' @param existing_data A list of xts objects containing time series data
+    #' @param start_date A string
+    #' @param end_date A string
+    #' 
+    #' @return A list of xts objects containing updated time series data
     
-    # existing_data <- load(file)
+    # load existing data, look for difference, add ticker or delete if necessary
     existing_names <- names(existing_data)
     names_to_add <- setdiff(syms, existing_names)
     names_to_remove <- setdiff(existing_names, syms)
